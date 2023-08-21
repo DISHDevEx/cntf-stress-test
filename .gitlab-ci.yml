@@ -55,7 +55,7 @@ deploy_10k_test_ues:
     entrypoint: [""]
   stage: deploy
   needs:
-    - job: ue_populate_random
+    - job: ue_populate_10k_random
       artifacts: true
   variables:
     REGION: us-east-1
@@ -99,8 +99,7 @@ cleanup:
     REGION: us-east-1
     CLUSTER_NAME: cntf-open5gs-cluster
   needs:
-    - job: smoke_test_scheduled
-    - job: ue_populate_random
+    - job: ue_populate_10k_random
       artifacts: true
   stage: cleanup
   environment:
