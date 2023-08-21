@@ -23,6 +23,7 @@ ue_populate_10k_random:
     - apt update
     - apt install -y python3
     - python3 --version # above three steps install python 
+    - apt-get install -y python3-pip
     - apk add python3 py3-pip
     - apt-get install -y python3 python3-pip
     - pip3 install requests
