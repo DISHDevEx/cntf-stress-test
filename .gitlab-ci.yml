@@ -102,6 +102,7 @@ cleanup:
     - job: ue_populate_10k_random
       artifacts: true
   stage: cleanup
+  when: manual
   environment:
     name: open5gs_cluster
   script:
