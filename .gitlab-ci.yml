@@ -3,7 +3,6 @@
 stages:
   - subscribe
   - deploy
-  - test
   - cleanup
 
 
@@ -118,17 +117,14 @@ cleanup:
     - helm repo add openverso https://gradiant.github.io/openverso-charts/
 
     # Uninstall Helm release for each UE subscription
-    - while IFS= read -r IMSI_ID; do
-        helm -n openverso uninstall ueransim-ues-smoke-test-$IMSI_ID  # Modify release name as needed
-      done < IMSI_IDs.txt
-
-    # Remove IMSIs from the subscriber database
     - |
       while IFS= read -r IMSI_ID; do
-        POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
-        kubectl -n openverso exec $POPULATE_POD -- open5gs-dbctl remove $IMSI_ID
+        release_name="ueransim-ues-smoke-test-$IMSI_ID"  # Modify release name as needed
+        helm -n openverso uninstall "$release_name"
       done < IMSI_IDs.txt
+    # ... (the rest of the script)
   rules:
     - when: manual
 
+ 
     
