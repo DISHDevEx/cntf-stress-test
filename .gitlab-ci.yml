@@ -4,11 +4,10 @@ stages:
   - subscribe
   - deploy
   - test
-  - update_tests
   - cleanup
 
 
-ue_populate_random:
+ue_populate_10k_random:
   allow_failure: true
   stage: subscribe
   image: ubuntu:latest
@@ -19,9 +18,9 @@ ue_populate_random:
     name: open5gs_cluster
   artifacts:
     paths:
-      - IMSI_ID
+      - IMSI_IDs.txt  # Changed artifact name to indicate multiple IDs
   before_script:
-  # Install dependencies and connect to cluster
+    # Install dependencies and connect to cluster
     - apt-get update && apt-get install -y curl unzip
     - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     - unzip awscliv2.zip
@@ -31,27 +30,27 @@ ue_populate_random:
     - mv kubectl /usr/local/bin/
     - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
   script:
-# Generate random 10-digit number for IMSI
+    # Generate and populate random IMSI IDs
     - digits=10
-    - a=$(date +%s)
-    - b=$((a*RANDOM))
     - >
-      while [ ${#b} -lt 12 ]; do
-        b="${b}$RANDOM"
+      for _ in {1..10000}; do
+        a=$(date +%s)
+        b=$((a*RANDOM))
+        while [ ${#b} -lt 12 ]; do
+          b="${b}$RANDOM"
+        done
+        IMSI_ID=$(echo "${b:0:digits}")
+        echo $IMSI_ID >> IMSI_IDs.txt
       done
-    - IMSI_ID=$(echo "${b:0:digits}")
-    - printf $IMSI_ID
-# exec into populate pod and create UE subscription with that number
+    # exec into populate pod and create UE subscriptions using generated IDs
     - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
-    - kubectl -n openverso exec $POPULATE_POD --  open5gs-dbctl add_ue_with_slice ${CI_PIPELINE_ID} 465B5CE8B199B49FAA5F0A2EE238A6BC E8ED289DEBA952E4283B54E88E6183CA internet 1 111111
-# write the IMSI_ID as an artifact to be used in later jobs
-    - echo $IMSI_ID > IMSI_ID
-
+    - while read -r IMSI_ID; do
+        kubectl -n openverso exec $POPULATE_POD -- open5gs-dbctl add_ue_with_slice ${CI_PIPELINE_ID} 465B5CE8B199B49FAA5F0A2EE238A6BC E8ED289DEBA952E4283B54E88E6183CA internet 1 $IMSI_ID
+      done < IMSI_IDs.txt
 
 #Job that runs ueransim using that subscriber ID and executes script
 
-
-deploy test-ue:
+deploy_10k_test_ues:
   image:
     name: alpine/helm
     entrypoint: [""]
@@ -62,14 +61,11 @@ deploy test-ue:
   variables:
     REGION: us-east-1
     CLUSTER_NAME: cntf-open5gs-cluster
-  artifacts: # DELETE
-    paths: # DELETE
-      - IMSI_ID # DELETE
   environment:
-    name: open5gs_cluster 
-  script: 
+    name: open5gs_cluster
+  script:
     - apk add --no-cache python3 py3-pip jq
-    - pip3 install --upgrade pip 
+    - pip3 install --upgrade pip
     - pip3 install --no-cache-dir awscli
     - aws --version
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -77,66 +73,24 @@ deploy test-ue:
     - mv kubectl /usr/local/bin/
     - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
     - helm repo add openverso https://gradiant.github.io/openverso-charts/
-# source IMSI_ID value
-    - IMSI_ID=$(cat IMSI_ID)
-    - >
-      COMMON_LABEL=$(jq -n --arg CI_PIPELINE_ID "$CI_PIPELINE_ID" '{"gitlab-pipeline": $CI_PIPELINE_ID}')
-    - >
-      helm template -n openverso ueransim-ues-smoke-test  openverso/ueransim-ues \
-        --set ues.initialMSISDN="${IMSI_ID}"   \
-        --set-json commonLabels="${COMMON_LABEL}" \
-        --values https://raw.githubusercontent.com/DISHDevEx/napp/main/napp/open5gs_values/gnb_ues_values.yaml
-    - > 
-      helm -n openverso upgrade --install ueransim-ues-smoke-test  openverso/ueransim-ues \
-        --set ues.initialMSISDN="${IMSI_ID}"   \
-        --set-json commonLabels="${COMMON_LABEL}" \
-        --values https://raw.githubusercontent.com/DISHDevEx/napp/main/napp/open5gs_values/gnb_ues_values.yaml
 
+    # Loop over each IMSI_ID
+    - |
+      while IFS= read -r IMSI_ID; do
+        COMMON_LABEL=$(jq -n --arg CI_PIPELINE_ID "$CI_PIPELINE_ID" '{"gitlab-pipeline": $CI_PIPELINE_ID}')
+        helm template -n openverso ueransim-ues-smoke-test openverso/ueransim-ues \
+          --set ues.initialMSISDN="${IMSI_ID}" \
+          --set-json commonLabels="${COMMON_LABEL}" \
+          --values https://raw.githubusercontent.com/DISHDevEx/napp/main/napp/open5gs_values/gnb_ues_values.yaml | kubectl apply -f -
 
-smoke_test_scheduled:
-  image: ubuntu:latest
-  variables:
-    REGION: us-east-1
-    CLUSTER_NAME: cntf-open5gs-cluster
-  needs:
-    - job: deploy test-ue
-    - job: ue_populate_random
-      artifacts: true
-  stage: test
-  environment:
-    name: open5gs_cluster
-  artifacts:
-    paths:
-      - over5g.json
-      - overinternet.json 
-  script:
-    - apt update
-    - apt install -y python3
-    - python3 --version # above three steps install python 
-    - apt-get update && apt-get install -y curl unzip
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    - unzip awscliv2.zip
-    - ./aws/install
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
-    - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
-    # - UE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/instance=ueransim-ues-smoke-test)
-    - UE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l pod-template-hash=697554b858) # here we allocated the ueransim-gnb ues-pod to the variable "UE_POD" as the ues-smoke-test pod was unable to curl yahoo over uesimtun0
-    - kubectl -n openverso cp ./ueransim_smoke_test.sh $UE_POD:/tmp/ueransim_smoke_test.sh
-    - kubectl -n openverso exec $UE_POD -- bash -c "/tmp/ueransim_smoke_test.sh >&1"
-    - kubectl -n openverso cp $UE_POD:/over5g.json ./over5g.json
-    - kubectl -n openverso cp $UE_POD:/overinternet.json ./overinternet.json
-    - sh ./update_local_test_results.sh #added script that copies test result changes in the ueransim gnb-ues-pod pod into local files
-    - apt-get install -y python3-pip #install pip
-    - pip3 install boto3 # install boto3
-    - export PYTHONPATH="/usr/local/lib/python3.8/site-packages"  # Adjust the path if necessary 
-    - python3 ./s3_test_results_coralogix.py # converts over5g.json & overinternet.json files into objects in an S3 bucket
-    - sh ./update_s3_test_results.sh # continuously updates new local test data in S3 objects
+        helm -n openverso upgrade --install ueransim-ues-smoke-test openverso/ueransim-ues \
+          --set ues.initialMSISDN="${IMSI_ID}" \
+          --set-json commonLabels="${COMMON_LABEL}" \
+          --values https://raw.githubusercontent.com/DISHDevEx/napp/main/napp/open5gs_values/gnb_ues_values.yaml
+      done < IMSI_IDs.txt  # Use the file containing the generated IMSI IDs
 
 
 # Job that removes subscriber created in previous job
-
 
 cleanup:
   image:
@@ -153,8 +107,8 @@ cleanup:
   environment:
     name: open5gs_cluster
   script:
-    - apk add --no-cache python3 py3-pip 
-    - pip3 install --upgrade pip 
+    - apk add --no-cache python3 py3-pip
+    - pip3 install --upgrade pip
     - pip3 install --no-cache-dir awscli
     - aws --version
     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -162,118 +116,19 @@ cleanup:
     - mv kubectl /usr/local/bin/
     - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
     - helm repo add openverso https://gradiant.github.io/openverso-charts/
-# remove smoke-test helm release
-    - helm -n openverso uninstall ueransim-ues-smoke-test
-# delete test IMSI from subscriber database
-    - IMSI_ID=$(cat IMSI_ID)
-    - printf $IMSI_ID
-    - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
-    - kubectl -n openverso exec $POPULATE_POD --  open5gs-dbctl remove ${IMSI_ID}
+
+    # Uninstall Helm release for each UE subscription
+    - while IFS= read -r IMSI_ID; do
+        helm -n openverso uninstall ueransim-ues-smoke-test-$IMSI_ID  # Modify release name as needed
+      done < IMSI_IDs.txt
+
+    # Remove IMSIs from the subscriber database
+    - |
+      while IFS= read -r IMSI_ID; do
+        POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
+        kubectl -n openverso exec $POPULATE_POD -- open5gs-dbctl remove $IMSI_ID
+      done < IMSI_IDs.txt
   rules:
-    - when: always
+    - when: manual
 
-
-simulate_user_activity:
-  allow_failure: true
-  image:
-    name: alpine/helm
-    entrypoint: [""]
-  variables:
-    REGION: us-east-1
-    CLUSTER_NAME: cntf-open5gs-cluster
-  stage: test
-  artifacts:
-    paths:
-      - ${ARTIFACT}
-  script:
-    - apk add --no-cache python3 py3-pip jq
-    - pip3 install --upgrade pip 
-    - pip3 install --no-cache-dir awscli
-    - aws --version
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
-    - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-    - helm repo add openverso https://gradiant.github.io/openverso-charts/
-# install the ueransim helm chart, but using the image we build that includes puppeteer and our test scripts
-    - >
-      COMMON_LABEL=$(jq -n --arg CI_JOB_ID "${CI_JOB_ID}" --arg SCRIPT "${SCRIPT}" '{"gitlab-job": $CI_JOB_ID, "puppeteer-script": $SCRIPT}')
-    - > 
-      helm -n openverso upgrade --install ueransim-ues-puppeteer-${SCRIPT}  openverso/ueransim-ues \
-        --set ues.initialMSISDN="${IMSI_ID}"   \
-        --set image.registry=018300759195.dkr.ecr.us-east-1.amazonaws.com --set image.repository=cntf-ueransim-puppeteer \
-        --set-json commonLabels="${COMMON_LABEL}" \
-        --set-json podLabels="${COMMON_LABEL}" \
-        --values https://raw.githubusercontent.com/DISHDevEx/napp/main/napp/open5gs_values/gnb_ues_values.yaml
-    - kubectl -n openverso rollout status deployment ueransim-ues-puppeteer-${SCRIPT}
-    - kubectl -n openverso exec deployment.apps/ueransim-ues-puppeteer-${SCRIPT} -- bash -c "node /app/${SCRIPT}.js >&1"
-    - UE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l gitlab-job=$CI_JOB_ID)
-    - kubectl -n openverso cp ${UE_POD}:/app/${ARTIFACT} ./${ARTIFACT}
-  parallel:
-    matrix:
-      - SCRIPT: youtube-search
-        IMSI_ID: 9090909090
-        ARTIFACT: youtube_invaders_video.png
-      - SCRIPT: amazon-search
-        IMSI_ID: 9090909091
-        ARTIFACT: 5g_reference_guide.png
-      - SCRIPT: devtools-search
-        IMSI_ID: 9090909092
-
-update_test_results:
-  allow_failure: true
-  image:
-    name: alpine/helm
-    entrypoint: [""]
-  variables:
-    REGION: us-east-1
-    CLUSTER_NAME: cntf-open5gs-cluster
-  stage: update_tests
-  script:
-    - apk add --no-cache python3 py3-pip jq
-    - pip3 install --upgrade pip 
-    - pip3 install --no-cache-dir awscli
-    - aws --version
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
-    - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-    - helm repo add openverso https://gradiant.github.io/openverso-charts/
-    - sh ./update_local_test_results.sh
-    - python3 ./s3_test_results_coralogix.py # converts over5g.json & overinternet.json files into objects in an S3 bucket
-    - sh ./update_s3_test_results.sh # continuously updates new local test data in S3 objects
-   
     
-puppeteer-cleanup:
-  image:
-    name: alpine/helm
-    entrypoint: [""]
-  variables:
-    REGION: us-east-1
-    CLUSTER_NAME: cntf-open5gs-cluster
-  needs: 
-    - simulate_user_activity
-    - update_test_results
-  stage: cleanup
-  environment:
-    name: open5gs_cluster
-  script:
-    - apk add --no-cache python3 py3-pip 
-    - pip3 install --upgrade pip 
-    - pip3 install --no-cache-dir awscli
-    - aws --version
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
-    - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-    - helm repo add openverso https://gradiant.github.io/openverso-charts/
-# remove smoke-test helm release
-    - helm -n openverso uninstall ueransim-ues-puppeteer-${SCRIPT}
-  parallel:
-    matrix:
-      - SCRIPT: 
-          - youtube-search
-          - amazon-search
-          - devtools-search
-  rules:
-    - when: always
