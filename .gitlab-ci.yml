@@ -123,8 +123,7 @@ cleanup:
         helm -n openverso uninstall "$release_name"
       done < IMSI_IDs.txt
     # ... (the rest of the script)
-  rules:
-    - when: manual
+  
 
  
     
