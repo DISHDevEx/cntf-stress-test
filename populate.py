@@ -27,7 +27,7 @@ for _ in range(10):
     if populate_pod.returncode == 0:
         populate_pod_name = populate_pod.stdout.strip()
         subprocess.run(
-            ["kubectl", "-n", "openverso", "exec", populate_pod_name, "--", "open5gs-dbctl", "add_ue_with_slice", str(12345), "465B5CE8B199B49FAA5F0A2EE238A6BC", "E8ED289DEBA952E4283B54E88E6183CA", "internet", "1", imsi_id]
+            ["kubectl", "-n", "openverso", "exec", populate_pod_name, "--", "open5gs-dbctl", "add_ue_with_slice", imsi_id, "465B5CE8B199B49FAA5F0A2EE238A6BC", "E8ED289DEBA952E4283B54E88E6183CA", "internet", "1", imsi_id]
         )
 
         # Append IMSI_ID to IMSI_IDs.txt for later use
