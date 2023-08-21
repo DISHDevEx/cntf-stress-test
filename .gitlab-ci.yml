@@ -30,7 +30,9 @@ ue_populate_10k_random:
     - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
     - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
   script:
+    - echo "started script"
     - sh ./10k_populate.sh
+    - echo "ended script"
 
 deploy_10k_test_ues:
   image:
