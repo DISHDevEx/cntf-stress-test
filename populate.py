@@ -13,7 +13,7 @@ def generate_random_imsi():
     return imsi_id
 
 # Loop to subscribe 10 UEs
-for _ in range(10):
+for _ in range(10000):
     imsi_id = generate_random_imsi()
     print(f"Subscribing UE with IMSI: {imsi_id}")
 
