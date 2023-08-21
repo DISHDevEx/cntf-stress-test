@@ -4,6 +4,7 @@
 
 # Generate random 10-digit number for IMSI
 generate_random_imsi() {
+    echo "generate called"
     digits=10
     a=$(date +%s)
     b=$((a*RANDOM))
@@ -16,6 +17,7 @@ generate_random_imsi() {
 
 # Loop to subscribe 10 UEs
 for _ in $(seq 1 10); do
+    echo "loop start"
     IMSI_ID=$(generate_random_imsi)
     echo "Subscribing UE with IMSI: $IMSI_ID"
 
