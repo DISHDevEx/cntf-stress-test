@@ -20,6 +20,8 @@ ue_populate_10k_random:
       - IMSI_IDs.txt  # Changed artifact name to indicate multiple IDs
   before_script:
     # Install dependencies and connect to cluster
+    - apk update
+    - apk add python3 py3-pip
     - apt-get install -y python3 python3-pip
     - pip3 install requests
     - pip3 install --upgrade pip
