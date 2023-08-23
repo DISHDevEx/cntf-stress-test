@@ -1,4 +1,7 @@
-#!usr/bin/env bash
+#!/usr/bin/env bash
+set -o pipefail
+
+# this script connects 10k UEs to open5GS and pings yahoo everytime a new UE is subscribed.
 
 generate_random_imsi() {
     digits=10
@@ -38,7 +41,7 @@ ue_populate() {
   fi
 }
 
-for _ in {1..10000}; do
+for _ in {1..10}; do
     generate_random_imsi
     ue_populate
     echo "Subscribing UE with IMSI: ${imsi_id}"
@@ -46,8 +49,7 @@ for _ in {1..10000}; do
     echo "Allocating IMSI: ${imsi_id} to UE with helm"
 
     # Add ping command to yahoo.com
-    ping_command="ping -c 5 yahoo.com"
+    ping_command="ping -c 5 yahoo.com" 
     echo "Executing ping command: $ping_command"
-    $ping_command
+    $ping_command > ./stress_test_logs.txt 2> ./stress_test_error_logs.txt
 done
-

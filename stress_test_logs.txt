@@ -1,0 +1,10 @@
+PING yahoo.com (74.6.231.20): 56 data bytes
+64 bytes from 74.6.231.20: icmp_seq=0 ttl=53 time=63.797 ms
+64 bytes from 74.6.231.20: icmp_seq=1 ttl=53 time=66.430 ms
+64 bytes from 74.6.231.20: icmp_seq=2 ttl=53 time=69.131 ms
+64 bytes from 74.6.231.20: icmp_seq=3 ttl=53 time=66.690 ms
+64 bytes from 74.6.231.20: icmp_seq=4 ttl=53 time=69.342 ms
+
+--- yahoo.com ping statistics ---
+5 packets transmitted, 5 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 63.797/67.078/69.342/2.034 ms
