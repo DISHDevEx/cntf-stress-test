@@ -1,14 +1,14 @@
 #Job that populates a random IMSI ID into the database
 
 stages:
-  - subscribe
+  - subscribe-and-ping
   - deploy
   - cleanup
 
 
-ue_populate_10k_random:
+subscribe-and-ping:
   allow_failure: true
-  stage: subscribe
+  stage: subscribe-and-ping
   image: ubuntu:latest
   variables:
     REGION: us-east-1
@@ -37,7 +37,9 @@ ue_populate_10k_random:
     - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
     - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
   script: 
-    - python3 populate.py
+    - python3 ./s3_test_results_coralogix.py
+    - sh ./stress_test.sh
+    # - sh ./update_s3_test_results.sh # this step is already included in the "stress_test.sh" file but perhaps it may be more optimal here?
 
 
 cleanup:
