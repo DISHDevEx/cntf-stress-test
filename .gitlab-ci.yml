@@ -2,6 +2,7 @@
 
 stages:
   - subscribe-and-ping
+  - deploy
   - cleanup
 
 
@@ -18,23 +19,24 @@ subscribe-and-ping:
     paths:
       - IMSI_IDs.txt  # Changed artifact name to indicate multiple IDs
   before_script:
-    # Install dependencies and connect to cluster
-    - apt update
-    - apt install -y python3
-    - python3 --version # above three steps install python 
-    - apt-get install -y python3-pip
-    - apt-get install -y python3 python3-pip
-    - pip3 install requests
-    - pip3 install --upgrade pip
-    - apt-get update && apt-get install -y curl unzip
-    - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-    - unzip awscliv2.zip
-    - ./aws/install
-    - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    - chmod +x kubectl
-    - mv kubectl /usr/local/bin/
-    - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
-    - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
+  # Install dependencies and connect to cluster
+  - apt update
+  - apt install -y python3
+  - python3 --version # above three steps install python 
+  - apt-get install -y python3-pip
+  - apt-get install -y python3 python3-pip
+  - pip3 install requests
+  - pip3 install --upgrade pip
+  - pip3 install boto3  
+  - apt-get update && apt-get install -y curl unzip
+  - curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  - unzip awscliv2.zip
+  - ./aws/install
+  - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+  - chmod +x kubectl
+  - mv kubectl /usr/local/bin/
+  - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
+  - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
   script: 
     - python3 ./s3_test_results_coralogix.py
     - sh ./stress_test.sh
@@ -48,6 +50,9 @@ cleanup:
   variables:
     REGION: us-east-1
     CLUSTER_NAME: cntf-open5gs-cluster
+  needs:
+    - job: ue_populate_10k_random
+      artifacts: true
   stage: cleanup
   when: manual
   environment:
@@ -64,6 +69,7 @@ cleanup:
     - helm repo add openverso https://gradiant.github.io/openverso-charts/
     - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
     - kubectl -n openverso exec $POPULATE_POD -n openverso -- open5gs-dbctl reset
+
 
 
  
