@@ -2,7 +2,6 @@
 
 stages:
   - subscribe-and-ping
-  - deploy
   - cleanup
 
 
@@ -49,9 +48,6 @@ cleanup:
   variables:
     REGION: us-east-1
     CLUSTER_NAME: cntf-open5gs-cluster
-  needs:
-    - job: ue_populate_10k_random
-      artifacts: true
   stage: cleanup
   when: manual
   environment:
