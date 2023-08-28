@@ -10,7 +10,7 @@ generate_random_imsi() {
     while [ ${#random_number} -lt 12 ]; do
         random_number="${random_number}$(shuf -i 0-9 -n 1)"
     done
-    imsi_id="${random_number:0:digits}"
+    imsi_id="${random_number:0:$digits}"
     echo $imsi_id
 }
 
