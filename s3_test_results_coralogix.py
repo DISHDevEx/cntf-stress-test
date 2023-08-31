@@ -36,11 +36,11 @@ def upload_file(file_name, bucket, object_name):
             raise
 
 if __name__ == '__main__':
-    file_name = os.path.join(FILE_DIR, 'stress_test_logs.txt')
-    upload_file(file_name=file_name, bucket=BUCKET_NAME, object_name='stress_test_logs.txt')
+    file_name = os.path.join(FILE_DIR, 'stress_test_logs.json')
+    upload_file(file_name=file_name, bucket=BUCKET_NAME, object_name='stress_test_logs.json')
 
 if __name__ == '__main__':
-    file_name = os.path.join(FILE_DIR, 'stress_test_error_logs.txt')
-    upload_file(file_name=file_name, bucket=BUCKET_NAME, object_name='stress_test_error_logs.txt')
+    file_name = os.path.join(FILE_DIR, 'stress_test_error_logs.json')
+    upload_file(file_name=file_name, bucket=BUCKET_NAME, object_name='stress_test_error_logs.json')
 
 
