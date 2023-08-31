@@ -49,6 +49,16 @@ for _ in {1..10}; do
     echo "Allocating IMSI: ${imsi_id} to UE with helm"
 
 
+    data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
+
+    # Generate random data to simulate the upload
+    random_data=$(openssl rand -base64 $data_size_in_bytes)
+
+    # Send a POST request to a test endpoint (replace with an appropriate URL)
+    curl -X POST -H "Content-Type: application/octet-stream" --data-binary "your_data_here" https://postman-echo.com/post > stress_test_logs.json 2>&1
+
+    echo "Data upload complete"
+
     # # Add ping command to yahoo.com
     # ping_command="ping -c 5 yahoo.com"
     # echo "Executing ping command: $ping_command"
