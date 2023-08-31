@@ -55,7 +55,7 @@ for _ in {1..10}; do
     random_data=$(openssl rand -base64 $data_size_in_bytes)
 
     # Send a POST request to a test endpoint (replace with an appropriate URL)
-    curl -X POST -H "Content-Type: application/octet-stream" --data-binary "your_data_here" https://postman-echo.com/post > stress_test_logs.json 2>&1
+    curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post > stress_test_logs.json 2>&1
 
     echo "Data upload complete"
 
