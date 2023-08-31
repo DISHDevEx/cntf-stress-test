@@ -51,6 +51,8 @@ for _ in {1..10}; do
     # Add ping command to yahoo.com
     ping_command="ping -c 5 yahoo.com"
     echo "Executing ping command: $ping_command"
-    { $ping_command | jq -c '. + {"test": "stress_test"}'; } >> stress_test_logs.json 2>> stress_test_error_logs.json # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
-    sh ./update_s3_test_results.sh # this reflects the changes made to the local files: "stress_test_logs.txt" & "stress_test_error_logs.txt" in S3. perhaps remove this and add it as the last step of CI/CD pipeline?
+    ping_output="$($ping_command)"
+    ping_json=$(jq -n --arg ping_output "$ping_output" '{"ping_output": $ping_output, "test": "stress_test"}')
+    echo "$ping_json" >> stress_test_logs.json || { echo "Error message" >> stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
+    sh ./update_s3_test_results.sh 
 done
