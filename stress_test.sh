@@ -52,8 +52,9 @@ for _ in {1..10}; do
     ping_command="ping -c 5 yahoo.com"
     echo "Executing ping command: $ping_command"
     ping_output="$($ping_command)"
-    # ping_json=$(jq -n --arg ping_output "$ping_output" '{"ping_output": $ping_output, "test": "stress_test"}')
-    ping_json=$(jq -n --arg ping_output "$ping_output" '{"ping_output": $ping_output | gsub("\n"; " "), "test": "stress_test"}')
+    # ping_json=$(jq -n --arg ping_output "$ping_output" '{"ping_output": $ping_output | gsub("\n"; " "), "test": "stress_test"}')
+    ping_output_no_linebreaks="${ping_output//$'\n'/ }"  # Replace newline with space
+    ping_json='{"ping_output": "'"$ping_output_no_linebreaks"'", "test": "stress_test"}'
 
     echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
     sh ./update_s3_test_results.sh 
