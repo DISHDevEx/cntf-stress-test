@@ -48,25 +48,6 @@ for _ in {1..10}; do
     run_helm_commands
     echo "Allocating IMSI: ${imsi_id} to UE with helm"
 
-    # Define the upload URL
-    upload_url="https://postman-echo.com/post"
-
-    # Generate 3MB of random data
-    data_size_mb=3
-    data="$(dd if=/dev/urandom bs=1M count=$data_size_mb 2>/dev/null | base64)"
-
-    # Perform the upload using curl and measure the upload speed
-    upload_command="curl -X POST -d '$data' $upload_url"
-    echo "Executing upload command: $upload_command"
-    upload_output="$($upload_command)"
-
-    # Prepare the output as JSON
-    upload_json='{"upload_output": "'"$upload_output"'", "test": "upload_speed_test"}'
-
-    # Display the JSON output
-    echo "$upload_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; }
-
-
 
     # # Add ping command to yahoo.com
     # ping_command="ping -c 5 yahoo.com"
