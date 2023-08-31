@@ -1,7 +1,7 @@
 # CNTF - Stress Test
 
 ## Purpose
-This source code repository stores the configurations to load ten thousand User Equipment devices (UEs) to the 5g network while simultaneously performing HTTP requests to webservers.
+This source code repository stores the configurations to load ten thousand User Equipment devices (UEs) to the 5g network while simultaneously uploading data packets to webservers.
 
 ## Project structure
 ```
