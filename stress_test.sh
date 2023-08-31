@@ -53,6 +53,6 @@ for _ in {1..10}; do
     echo "Executing ping command: $ping_command"
     ping_output="$($ping_command)"
     ping_json=$(jq -n --arg ping_output "$ping_output" '{"ping_output": $ping_output, "test": "stress_test"}')
-    echo "$ping_json" >> stress_test_logs.json || { echo "Error message" >> stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
+    echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
     sh ./update_s3_test_results.sh 
 done
