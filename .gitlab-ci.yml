@@ -1,6 +1,7 @@
 #Job that populates a random IMSI ID into the database
 
 stages:
+  - install_helm
   - subscribe-and-ping
   - deploy
   - cleanup
