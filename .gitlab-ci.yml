@@ -64,6 +64,7 @@ subscribe-and-ping:
   - POPULATE_POD=$(kubectl -n cntf-tests get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
   script: 
     - python3 ./s3_test_results_coralogix.py
+    - sleep 200 # this command will allow all the network functions to finish getting set up before executing the below script
     - sh ./stress_test.sh
     # - sh ./update_s3_test_results.sh # this step is already included in the "stress_test.sh" file but perhaps it may be more optimal here?
 
@@ -91,8 +92,8 @@ cleanup:
     - helm repo add openverso https://gradiant.github.io/openverso-charts/
     - POPULATE_POD=$(kubectl -n cntf-tests get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
     - kubectl exec $POPULATE_POD -n cntf-tests -- open5gs-dbctl reset
-    - helm  --uninstall cntf-open5gs openverso/open5gs --namespace cntf-tests 
-    - helm  --uninstall cntf-ueransim-gnb openverso/ueransim-gnb --namespace cntf-tests 
+    - helm uninstall cntf-open5gs --namespace cntf-tests 
+    - helm uninstall cntf-ueransim-gnb --namespace cntf-tests 
     - kubectl delete namespace cntf-tests
 
 
