@@ -51,13 +51,16 @@ for _ in {1..10}; do
 
     data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
 
-    # Generate random data to simulate the upload
-    random_data=$(openssl rand -base64 $data_size_in_bytes)
+# Generate random data to simulate the upload
+random_data=$(openssl rand -base64 $data_size_in_bytes)
 
-    # Send a POST request to a test endpoint (replace with an appropriate URL)
-    upload_speed=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1 | awk '/^[[:space:]]*"speed_download":/ {print $2}')
+# Send a POST request to a test endpoint (replace with an appropriate URL)
+upload_speed=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1 | awk '/^[[:space:]]*"speed_download":/ {print $2}')
 
-    echo "Upload Speed: $upload_speed bytes/second"
+# Save upload speed to the log file
+echo "{\"upload_speed\": \"$upload_speed bytes/second\"}" > stress_test_logs.json
+
+echo "Data upload complete"
 
     # # Add ping command to yahoo.com
     # ping_command="ping -c 5 yahoo.com"
