@@ -55,9 +55,9 @@ for _ in {1..10}; do
     random_data=$(openssl rand -base64 $data_size_in_bytes)
 
     # Send a POST request to a test endpoint (replace with an appropriate URL)
-    curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post > stress_test_logs.json 2>&1
+    upload_speed=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1 | awk '/^[[:space:]]*"speed_download":/ {print $2}')
 
-    echo "Data upload complete"
+    echo "Upload Speed: $upload_speed bytes/second"
 
     # # Add ping command to yahoo.com
     # ping_command="ping -c 5 yahoo.com"
