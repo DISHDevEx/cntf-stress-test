@@ -55,10 +55,16 @@ for _ in {1..10}; do
 random_data=$(openssl rand -base64 $data_size_in_bytes)
 
 # Send a POST request to a test endpoint (replace with an appropriate URL)
-upload_speed=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1 | awk -F':' '/upload_speed/{gsub(/[",]/, "", $2); print $2}')
+upload_result=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1)
+
+# Extract the time taken from the curl output
+time_taken=$(echo "$upload_result" | awk -F': ' '/^time_total/{print $2}')
+
+# Calculate upload speed in bytes per second
+upload_speed=$(awk "BEGIN {printf \"%.2f\", $data_size_in_bytes / $time_taken}")
 
 # Save upload speed to the log file
-echo "{\"upload_speed\": \"$upload_speed\"}" > stress_test_logs.json
+echo "{\"upload_speed\": \"$upload_speed bytes/second\"}" > stress_test_logs.json
 
 echo "Data upload complete"
 
