@@ -48,14 +48,36 @@ for _ in {1..10}; do
     run_helm_commands
     echo "Allocating IMSI: ${imsi_id} to UE with helm"
 
-    # Add ping command to yahoo.com
-    ping_command="ping -c 5 yahoo.com"
-    echo "Executing ping command: $ping_command"
-    ping_output="$($ping_command)"
-    # ping_json=$(jq -n --arg ping_output "$ping_output" '{"ping_output": $ping_output | gsub("\n"; " "), "test": "stress_test"}')
-    ping_output_no_linebreaks="${ping_output//$'\n'/ }"  # Replace newline with space
-    ping_json='{"ping_output": "'"$ping_output_no_linebreaks"'", "test": "stress_test"}'
+        # Define the upload URL
+    upload_url="https://www.yahoo.com"
 
-    echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
+    # Generate 3MB of random data
+    data_size_mb=3
+    data="$(dd if=/dev/urandom bs=1M count=$data_size_mb 2>/dev/null | base64)"
+
+    # Perform the upload using curl and measure the upload speed
+    upload_command="curl -X POST -d '$data' $upload_url"
+    echo "Executing upload command: $upload_command"
+    upload_output="$($upload_command 2> stress_test_error_logs.json)"  # Redirect stderr to error log file
+
+    # Prepare the output as JSON
+    upload_json='{"upload_output": "'"$upload_output"'", "test": "upload_speed_test"}'
+
+    # Save the upload_json to stress_test_logs.json
+    echo "$upload_json" > stress_test_logs.json
+
+    # Display the JSON output
+    echo "$upload_json"
+
+
+
+    # # Add ping command to yahoo.com
+    # ping_command="ping -c 5 yahoo.com"
+    # echo "Executing ping command: $ping_command"
+    # ping_output="$($ping_command)"
+    # ping_output_no_linebreaks="${ping_output//$'\n'/ }"  # Replace newline with space
+    # ping_json='{"ping_output": "'"$ping_output_no_linebreaks"'", "test": "stress_test"}'
+
+    # echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
     sh ./update_s3_test_results.sh 
 done
