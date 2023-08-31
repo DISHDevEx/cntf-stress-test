@@ -49,33 +49,33 @@ for _ in {1..10}; do
     echo "Allocating IMSI: ${imsi_id} to UE with helm"
 
 
-    data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
+#     data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
 
-# Generate random data to simulate the upload
-random_data=$(openssl rand -base64 $data_size_in_bytes)
+# # Generate random data to simulate the upload
+# random_data=$(openssl rand -base64 $data_size_in_bytes)
 
-# Send a POST request to a test endpoint (replace with an appropriate URL)
-upload_result=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1)
+# # Send a POST request to a test endpoint (replace with an appropriate URL)
+# upload_result=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1)
 
-# Extract the time taken from the curl output
-time_taken=$(echo "$upload_result" | awk -F': ' '/^time_total/{print $2}')
+# # Extract the time taken from the curl output
+# time_taken=$(echo "$upload_result" | awk -F': ' '/^time_total/{print $2}')
 
-# Calculate upload speed in bytes per second
-upload_speed=$(awk "BEGIN {printf \"%.2f\", $data_size_in_bytes / $time_taken}")
+# # Calculate upload speed in bytes per second
+# upload_speed=$(awk "BEGIN {printf \"%.2f\", $data_size_in_bytes / $time_taken}")
 
-# Save upload speed to the log file
-echo "{\"upload_speed\": \"$upload_speed bytes/second\"}" > stress_test_logs.json
+# # Save upload speed to the log file
+# echo "{\"upload_speed\": \"$upload_speed bytes/second\"}" > stress_test_logs.json
 
-echo "Data upload complete"
+# echo "Data upload complete"
 
 
-    # # Add ping command to yahoo.com
-    # ping_command="ping -c 5 yahoo.com"
-    # echo "Executing ping command: $ping_command"
-    # ping_output="$($ping_command)"
-    # ping_output_no_linebreaks="${ping_output//$'\n'/ }"  # Replace newline with space
-    # ping_json='{"ping_output": "'"$ping_output_no_linebreaks"'", "test": "stress_test"}'
+    # Add ping command to yahoo.com
+    ping_command="ping -c 5 yahoo.com"
+    echo "Executing ping command: $ping_command"
+    ping_output="$($ping_command)"
+    ping_output_no_linebreaks="${ping_output//$'\n'/ }"  # Replace newline with space
+    ping_json='{"ping_output": "'"$ping_output_no_linebreaks"'", "test": "stress_test"}'
 
-    # echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
+    echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
     sh ./update_s3_test_results.sh 
 done
