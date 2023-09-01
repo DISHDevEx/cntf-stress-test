@@ -61,12 +61,17 @@ subscribe-and-ping:
   - chmod +x kubectl
   - mv kubectl /usr/local/bin/
   - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
-  - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
+  # - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
+  #set ue_pod to gnb_ues
+  - UE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l pod-template-hash=697554b858) # here we allocated the ueransim-gnb ues-pod to the variable "UE_POD" 
   script: 
     - python3 ./s3_test_results_coralogix.py
-    - sleep 120 # this command will allow all the network functions to finish getting set up before executing the below script
-    - sh ./stress_test.sh
-    # - sh ./update_s3_test_results.sh # this step is already included in the "stress_test.sh" file but perhaps it may be more optimal here?
+    # - sleep 120 # this command will allow all the network functions to finish getting set up before executing the below script
+    - kubectl -n openverso cp ./stress_test.sh $UE_POD:/tmp/stress_test.sh
+    - kubectl -n openverso exec $UE_POD -- bash -c "/tmp/stress_test.sh >&1"
+    # - sh ./stress_test.
+  #update s3 with test results 
+    - sh ./update_s3_test_results.sh 
 
 
 cleanup:
