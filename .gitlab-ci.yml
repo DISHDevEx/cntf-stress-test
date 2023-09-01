@@ -64,6 +64,7 @@ subscribe-and-ping:
   # - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate)
   #set ue_pod to gnb_ues
   - UE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l pod-template-hash=697554b858) # here we allocated the ueransim-gnb ues-pod to the variable "UE_POD" 
+  - chmod +x stress_test.sh
   script: 
     - python3 ./s3_test_results_coralogix.py
     # - sleep 120 # this command will allow all the network functions to finish getting set up before executing the below script
