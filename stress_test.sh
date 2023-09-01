@@ -45,8 +45,10 @@ for _ in {1..10}; do
     generate_random_imsi
     ue_populate
     echo "Subscribing UE with IMSI: ${imsi_id}"
+    echo "stress_test_ue_subscribed: ${imsi_id}" > stress_test_logs.json
     run_helm_commands
     echo "Allocating IMSI: ${imsi_id} to UE with helm"
+    echo "stress_test_ue_connected: ${imsi_id}" > stress_test_logs.json
 
     data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
 
