@@ -31,11 +31,9 @@ for _ in {1..10}; do
     upload_speed_mb=$(echo "scale=2; $upload_speed / 125000" | bc)
 
     #write logs to stess_test_logs file
-    echo "stress_test_upload_speed: $upload_speed_mb MB/s" > stress_test_logs.json
-
-    #update s3 with test results 
-    sh ./update_s3_test_results.sh 
+    echo "stress_test_upload_speed: $upload_speed_mb MB/s" >> stress_test_logs.json
 
 done
 
+#remove random_data
 rm random_data.txt
