@@ -1,13 +1,12 @@
 # CNTF - Stress Test
 
 ## Purpose
-This source code repository stores the configurations to load ten thousand User Equipment devices (UEs) to the 5g network while simultaneously uploading data packets to webservers.
+This source code repository stores the configurations to load thousands of User Equipment devices (UEs) to the 5g network while simultaneously uploading data to a webserver. This test gives insights on how well a 5g network can maintain quick upload speeds under heavy traffic.
 
 ## Deployment
 Prerequisites:
 
-* *Please ensure that you have configured the AWS CLI to authenticate to an AWS environment where you have adequate permissions to create a cluster, security groups and IAM roles.*
-
+* *Please ensure that you have configured the AWS CLI to authenticate to an AWS environment where you have adequate permissions to create an EKS cluster, security groups and IAM roles.*
 * *Please ensure that the "CNTF-Main" branch has been deployed, as this ensures that the cluster and other necessary AWS infrastructure are available to support the execution of scripts in this repository.*  
 
 Steps:
