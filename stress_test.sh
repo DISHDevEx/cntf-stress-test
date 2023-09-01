@@ -71,7 +71,7 @@ for _ in {1..10}; do
     fi
 
     # upload_speed is measured in bytes/seconds 
-    upload_speed=$(curl -w '%{speed_upload}' -T random_data.txt https://postman-echo.com/post)
+    upload_speed=$(curl --interface uesimtun0 -w '%{speed_upload}' -T random_data.txt https://postman-echo.com/post)
 
     # change bytes/seconds to mb/seconds 
     upload_speed_mb=$(echo "scale=2; $upload_speed / 125000" | bc)
