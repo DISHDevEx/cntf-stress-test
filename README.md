@@ -30,13 +30,16 @@ This source code repository stores the configurations to load ten thousand User 
 └── stress_test.sh                     loads ten thousand ues on the 5g network while simultaneously making HTTP requests to webservers
 |  
 |
-└── stress_test_error_logs.txt         file which stores standard error logs from "stress_test.sh" test locally 
+└── stress_test_error_logs.json         file which stores standard error logs from "stress_test.sh" test locally 
 |
 |
-└── stress_test_logs.txt               file which stores standard output logs from "stress_test.sh" test locally
+└── stress_test_logs.json               file which stores standard output logs from "stress_test.sh" test locally
 |
 |
 └── s3_test_results_coralogix.py       converts local files into s3 objects 
+|
+|
+└── cntf_tests_namespace.yaml          creates a namespace called "cntf-tests" where a new deployment of ueransim and open5gs is made and is tested via the stress_test.sh script
 |  
 |
 └── update_s3_test_results.sh          updates test result data from stress test both locally and in aws       
