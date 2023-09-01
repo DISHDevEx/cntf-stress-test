@@ -50,25 +50,35 @@ for _ in {1..10}; do
 
     data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
 
-# Generate random data to simulate the upload
-random_data=$(openssl rand -base64 $data_size_in_bytes)
+    # Generate random data to simulate the upload
+    random_data=$(openssl rand -base64 $data_size_in_bytes | tr -d '\n')
 
-# Send a POST request to a test endpoint (replace with an appropriate URL)
-upload_result=$(curl -X POST -H "Content-Type: application/octet-stream" --data-binary "$random_data" https://postman-echo.com/post 2>&1)
+    # Only create random_txt file if it does not exist
+    if [ ! -e random_data.txt ]; then
+        # Generate random data to simulate the upload
+        random_data=$(openssl rand -base64 $data_size_in_bytes | tr -d '\n')
 
-# Extract the time taken from the curl output
-time_taken=$(echo "$upload_result" | awk -F': ' '/^time_total/{print $2}')
+        # Write random_data to a file
+        echo "$random_data" > random_data.txt
 
-# Calculate upload speed in bytes per second
-upload_speed=$(awk "BEGIN {printf \"%.2f\", $data_size_in_bytes / $time_taken}")
+        echo "Random data has been saved to random_data.txt"
+    else
+        echo "random_data.txt already exists. Skipping generation."
+    fi
 
-# Save upload speed to the log file
-echo "{\"upload_speed\": \"$upload_speed bytes/second\"}" > stress_test_logs.json
+    # upload_speed is measured in bytes/seconds 
+    upload_speed=$(curl -w '%{speed_upload}' -T random_data.txt https://postman-echo.com/post)
 
-echo "Data upload complete"
+    # change bytes/seconds to mb/seconds 
+    upload_speed_mb=$(echo "scale=2; $upload_speed / 125000" | bc)
 
+    #write logs to stess_test_logs file
+    echo "stress_test_upload_speed: $upload_speed_mb MB/s" > stress_test_logs.json
 
+    #update s3 with test results 
+    sh ./update_s3_test_results.sh 
 
+    
     # # Add ping command to yahoo.com
     # ping_command="ping -c 5 yahoo.com"
     # echo "Executing ping command: $ping_command"
@@ -77,5 +87,5 @@ echo "Data upload complete"
     # ping_json='{"ping_output": "'"$ping_output_no_linebreaks"'", "test": "stress_test"}'
 
     # echo "$ping_json" > stress_test_logs.json || { echo "Error message" > stress_test_error_logs.json; } # this outputs the logs from each ping to "stress_test_logs.json" and any error logs to "stress_test_error_logs.json"
-    sh ./update_s3_test_results.sh 
+    
 done
