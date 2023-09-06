@@ -1,6 +1,6 @@
 # #!/usr/bin/env bash
 
-# commands to install kubectl and helm on the gnb-ues pod
+# commands to install kubectl and helm on the populate pod
 install_dependencies () {
     apt update
     apt install -y curl
