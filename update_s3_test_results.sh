@@ -10,6 +10,7 @@ kubectl cp -n openverso $UE_POD:/tmp/stress_test_logs.json ./stress_test_logs.js
 udpate_s3() {
    aws s3 cp ./stress_test_logs.json s3://cntf-open5gs-test-results/stress_test_logs.json
    aws s3 cp ./stress_test_error_logs.json s3://cntf-open5gs-test-results/stress_test_error_logs.json
+   aws s3 cp ./time_to_populate_database.txt s3://cntf-open5gs-test-results/time_to_populate_database.txt  # update s3 with the time it takes to add a new IMSI_ID to the database
 }
 
 udpate_s3
