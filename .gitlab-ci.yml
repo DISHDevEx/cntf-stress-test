@@ -65,8 +65,8 @@ load_test:
   - aws eks update-kubeconfig --name $CLUSTER_NAME --region $REGION
   - POPULATE_POD=$(kubectl -n openverso get pod --output=jsonpath={.items..metadata.name} -l app.kubernetes.io/component=populate) 
   - chmod +x load_test.sh
-  - chmod +w time_to_populate_database.txt
   script: 
+  - chmod +w time_to_populate_database.txt
   - kubectl -n openverso cp ./time_to_populate_database.txt $POPULATE_POD:/time_to_populate_database.txt
   - kubectl -n openverso cp ./load_test.sh $POPULATE_POD:/load_test.sh
   - kubectl -n openverso exec $POPULATE_POD -- bash -c "/load_test.sh >&1"
