@@ -1,6 +1,7 @@
 stages:
   # - install_helm
-  - stress-test
+  - load_network
+  - send_data
   - deploy
   - cleanup
 
@@ -34,7 +35,7 @@ stages:
 
 load_test:
   allow_failure: true
-  stage: stress-test
+  stage: load_network
   image: ubuntu:latest
   variables:
     REGION: us-east-1
@@ -72,7 +73,7 @@ load_test:
 
 send_data_over_network:
   allow_failure: true
-  stage: stress-test
+  stage: send_data
   image: ubuntu:latest
   variables:
     REGION: us-east-1
