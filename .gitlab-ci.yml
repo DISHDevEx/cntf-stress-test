@@ -119,7 +119,7 @@ cleanup:
     REGION: us-east-1
     CLUSTER_NAME: cntf-open5gs-cluster
   stage: cleanup
-  when: manual
+  # when: manual                                                    # commenting this out so the cleanup runs automatically
   environment:
     name: open5gs_cluster
   script:
