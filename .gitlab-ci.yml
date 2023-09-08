@@ -5,32 +5,6 @@ stages:
   - update_tests
   - cleanup
 
-# Install ueransim with a custom helm values file (cntf_gnb_ues_values.yaml) which has a "count" value which allows for thousands of UEs to be deployed
-
-# install_apps:
-#   image:
-#     name: alpine/helm
-#     entrypoint: [""]
-#   stage: install_helm
-#   variables:
-#     REGION: us-east-1
-#     CLUSTER_NAME: cntf-open5gs-cluster
-#   environment:
-#     name: open5gs_cluster 
-#   script:
-#     - apk add --no-cache python3 py3-pip 
-#     - pip3 install --upgrade pip 
-#     - pip3 install --no-cache-dir awscli
-#     - aws --version
-#     - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-#     - chmod +x kubectl
-#     - mv kubectl /usr/local/bin/
-#     - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
-#     - helm repo add openverso https://gradiant.github.io/openverso-charts/
-#     - helm upgrade --install open5gs openverso/open5gs --namespace openverso --values https://raw.githubusercontent.com/DISHDevEx/napp/main/napp/open5gs_values/5gSA_ues_values.yaml 
-#     - helm upgrade --install ueransim-gnb openverso/ueransim-gnb --namespace openverso --values cntf_gnb_ues_values.yaml # install ueransim using a custom values file that has a "count" configuration that allows for thousands of UEs to be created
-#     - sleep 80 # allow pods to finish creating before executing next stage of pipeline 
-
 # load 5g core with thousands of UEs
 
 load_test:
