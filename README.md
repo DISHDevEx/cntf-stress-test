@@ -33,17 +33,6 @@ Raw data: To view raw data resulting from test runs, please look at the data sto
 
 ## Project Structure
 ```
-├── open5gs
-|   ├── infrastructure                 contains infrastructure-as-code and helm configurations for open5gs & ueransim
-|      	├── eks
-|           └── fluentd-override.yaml  configures fluentd daemonset within the cluster
-|           └── otel-override.yaml     configures opentelemtry daemonset within the cluster
-|           └── provider.tf
-|           └── main.tf                    
-|           └── variables.tf                
-|           └── outputs.tf 
-|           └── versions.tf
-|
 └── .gitlab-ci.yml                     contains configurations to run CI/CD pipeline
 |
 |
