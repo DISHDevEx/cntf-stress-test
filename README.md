@@ -1,7 +1,7 @@
 # CNTF - Stress Test
 
 ## Purpose
-This source code repository stores the configurations to load thousands of User Equipment devices (UEs) to the 5g network while simultaneously uploading data to a webserver. This test gives insights on how well a 5g network can maintain quick upload speeds under heavy traffic.
+This source code repository stores the configurations to load thousands of User Equipment devices (UEs) to the 5g network while also uploading data to a webserver. This test gives insights on how well a 5g network can maintain quick upload speeds under heavy traffic.
 
 ## Deployment
 Prerequisites:
@@ -50,12 +50,7 @@ Raw data: To view raw data resulting from test runs, please look at the data sto
 └── README.md  
 |
 |
-└── open5gs_values.yml                 these values files contain configurations to customize resources defined in the open5gs & ueransim helm charts
-└── openverso_ueransim_gnb_values.yml                 
-└── openverso_ueransim_ues_values.yml 
-|
-|
-└── stress_test.sh                     loads ten thousand ues on the 5g network while simultaneously making HTTP requests to webservers
+└── stress_test.sh                     uploads 3MB of data to a postman endpoint, while doing calculations to predict the maximum upload speed of the network (MBps)
 |  
 |
 └── stress_test_error_logs.json        file which stores standard error logs from "stress_test.sh" test locally 
@@ -65,9 +60,15 @@ Raw data: To view raw data resulting from test runs, please look at the data sto
 |
 |
 └── s3_test_results_coralogix.py       converts local files into s3 objects 
-|
-|
-└── cntf_tests_namespace.yaml          creates a namespace called "cntf-tests" where a new deployment of ueransim and 5g core is made and is tested via the stress_test.sh script
 |  
 |
-└── update_s3_test_results.sh          updates test result data from stress test both locally and in aws       
+└── update_test_results.sh             updates test results both locally and in aws  
+|  
+|
+└── random_data.txt                    stores 3MB worth of data which gets uploaded to postman      
+|  
+|
+└── load_test.sh                       loads network with thousands of ues
+|  
+|
+└── time_to_populate_database.txt      local storage file for collecting logs relating to the time it takes for new ues to be registered on the network 
