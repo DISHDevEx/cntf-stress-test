@@ -25,8 +25,8 @@ Steps:
     * Note: *You must have an individual account created by Coralogix to gain access to this tenant.*
     
 Steps to view dashboards:
-1. At the top of the page select the dropdown next to "Dashboards"
-2. Select "Custom Dashboards" (All dashboards should have the tag "CNTF")
+    1. At the top of the page select the dropdown next to "Dashboards"
+    2. Select "Custom Dashboards" (All dashboards should have the tag "CNTF")
 
 * To view raw data resulting from test runs, please look at the data stored in AWS S3 buckets dedicated to CNTF.
 
