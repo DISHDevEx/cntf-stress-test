@@ -23,6 +23,11 @@ Steps:
 ## Coralogix Dashboards
 * To view the parsed & visualized data resulting from tests run by various CNTF repositories, please visit CNTF's dedicated Coralogix tenant: https://dish-wireless-network.atlassian.net/wiki/spaces/MSS/pages/543326302/Coralogix+BOAT+Change+Request 
     * Note: *You must have an individual account created by Coralogix to gain access to this tenant.*
+    
+Steps to view dashboards:
+1. At the top of the page select the dropdown next to "Dashboards"
+2. Select "Custom Dashboards" (All dashboards should have the tag "CNTF")
+
 * To view raw data resulting from test runs, please look at the data stored in AWS S3 buckets dedicated to CNTF.
 
 
