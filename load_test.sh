@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-set -e  
-set -x 
-set -o pipefail
+set -x # run in debug mode (see every step of script printed on console)
+set -e # quit script as soon as an error occurs
+set -o pipefail # ensure failure of pipe commands is accurately accounted for
+
 
 # Function to check and install dependencies if they are not present
 check_dependencies() {
