@@ -68,4 +68,4 @@ Raw data: To view raw data resulting from test runs, please look at the data sto
 * load_network - subscribes thousands of UEs to the network
 * send_data - send 3MB data file to Postman endpoint
 * update_tests - update test results locally and in AWS
-* Cleanup - removes all UE subscriptions from network database
+* cleanup - removes all UE subscriptions from network database
