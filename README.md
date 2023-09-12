@@ -54,7 +54,7 @@ Raw data: To view raw data resulting from test runs, please look at the data sto
 └── update_test_results.sh             updates test results both locally and in aws  
 |  
 |
-└── random_data.txt                    stores 3MB worth of data which gets uploaded to postman      
+└── random_data.txt                    stores 3MB worth of data which gets uploaded to postman endpoint   
 |  
 |
 └── load_test.sh                       loads network with thousands of ues
