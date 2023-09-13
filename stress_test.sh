@@ -4,7 +4,7 @@ set -e
 apk add openssl
 
 #test upload speed 10 times 
-for _ in {1..3}; do
+for _ in {1..10}; do
     
     data_size_in_bytes=$((3 * 1024 * 1024))  # 3MB in bytes
 
