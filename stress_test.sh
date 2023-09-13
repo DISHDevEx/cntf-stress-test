@@ -41,7 +41,6 @@
 
 #!/usr/bin/env bash
 set -e
-
 # Add openssl for random data creation
 apk add openssl
 
