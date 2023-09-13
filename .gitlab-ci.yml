@@ -1,6 +1,6 @@
 stages:
   # - install_helm
-  - load_network
+  # - load_network
   - send_data
   - update_tests
   - cleanup
