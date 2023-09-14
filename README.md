@@ -11,9 +11,29 @@ Prerequisites:
 
 
 Steps:
-1. Mirror this repository in Gitlab or connect this repository externally to Gitlab 
-2. Authenticate Gitlab with AWS: https://docs.gitlab.com/ee/ci/cloud_deployment/
-3. Perform these actions inside of the Gitlab repository:
+1. [Mirror](https://docs.gitlab.com/ee/user/project/repository/mirror/) this repository in Gitlab or connect this repository [externally](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/) to Gitlab 
+2. Set up a private Gitlab runner on the CNTF EKS cluster (***Note: You only need to do this process once, not every time you execute a new repository***):
+    * In Gitlab, on the left side of the screen, hover over "settings" and select "CI/CD"
+    * Next to "Runners" select "expand"
+    * Unselect "Enable shared runners for this project"
+    * Click "New project runner"
+    * Under "Operating systems" select "Linux"
+    * Fill out the "Tags" section and select "Run untagged jobs"
+    * Scroll to the bottom and select "Create runner"
+    * Copy and save the "runner token" listed under "Step 1"
+    * Select "Go to runners page", you should now see your runner listed with a warning sign next to it under "Assigned project runners"
+    * On your local terminal:
+        * Install the helm gitlab repository: "helm repo add gitlab https://charts.gitlab.io"
+        * intialize helm (for helm version 2): "helm init" 
+        * create a namespace for your gitlab runner(s) in the cntf cluster: "kubectl create namespace <NAMESPACE (e.g. "gitlab-runners")>"
+        * Install your created runner via helm: 
+        "helm upgrade --install <RUNNER_NAME> -n gitlab-runner --set runnerRegistrationToken=<RUNNER_TOKEN> --set gitlabUrl=http://www.gitlab.com gitlab/gitlab-runner"
+        * Check to see if your runner is working: "kubectl get pods -n <NAMESPACE>" (you should see "1/1" under "READY" and "Running" under "STATUS")
+    * In Gitlab, Under "Assigned project runners" you should now see that your runner has a green circle to it, signaling that its properly configured
+
+3. Authenticate Gitlab with AWS: https://docs.gitlab.com/ee/ci/cloud_deployment/
+
+4. Perform these actions inside of the Gitlab repository:
     * On the left side of the screen click the drop-down arrow next to "Build" and select "Pipelines"
     * In the top right hand corner select "Run Pipeline"
     * In the drop-down under "Run for branch name or tag" select the appropriate branch name and click "Run Pipeline"
