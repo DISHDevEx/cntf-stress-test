@@ -40,7 +40,7 @@ Steps:
     * Once again, click the drop-down arrow next to "Build" and select "Pipelines", you should now see the pipeline being executed
 
 ## Pipeline Stages
-**Goal of each stage in the pipeline** (reference: ".gitlab-ci.yml"):
+Goal of each stage in the pipeline (refer to ".gitlab-ci.yml" for more details):
 * load_network - subscribes thousands of UEs to the network
 * send_data - send 3MB data file to endpoint
 * update_tests - update test results locally and in AWS
