@@ -5,14 +5,13 @@ This source code repository stores the configurations to load thousands of User 
 
 ## Deployment
 Prerequisites:
-
 * *Please ensure that you have configured the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-quickstart.html) to authenticate to an AWS environment where you have adequate permissions to create an EKS cluster, security groups and IAM roles* 
 * *Please ensure that the pipeline in the "CNTF-Main" repository has been successfully deployed, as this ensures that all necessary components are available to support the execution of scripts in this repository.*  
 
 
 Steps:
 1. [Mirror](https://docs.gitlab.com/ee/user/project/repository/mirror/) this repository OR connect it [externally](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/) to Gitlab 
-2. Set up a private Gitlab runner on the CNTF EKS cluster (***Note: You only need to do this process once, not every time you execute code in a different CNTF repository***):
+2. Set up a private Gitlab runner on the CNTF EKS cluster (***Note:*** *You only need to do this process once, this runner can be used by the other CNTF repositories you execute*):
     * In Gitlab, on the left side of the screen, hover over "settings" and select "CI/CD"
     * Next to "Runners" select "expand"
     * Unselect "Enable shared runners for this project"
@@ -30,6 +29,9 @@ Steps:
         "helm upgrade --install <_RUNNER_NAME_> -n <_NAMESPACE_> --set runnerRegistrationToken=<_RUNNER_TOKEN_> --set gitlabUrl=http://www.gitlab.com gitlab/gitlab-runner"
         * Check to see if your runner is working: "kubectl get pods -n <_NAMESPACE_>" (you should see "1/1" under "READY" and "Running" under "STATUS")
     * In Gitlab, Under "Assigned project runners" you should now see that your runner has a green circle next to it, signaling a "ready" status
+    * **How to re-use this runner for other CNTF repositories:**
+        * Hover over "Settings" and select "CI/CD"
+        * Under "Other available runners", find the runner you have created and select "Enable for this project".
 
 3. Authenticate [Gitlab with AWS](https://docs.gitlab.com/ee/ci/cloud_deployment/)
 
@@ -41,10 +43,10 @@ Steps:
 
 ## Pipeline Stages
 Goal of each stage in the pipeline (refer to ".gitlab-ci.yml" for more details):
-* load_network - subscribes thousands of UEs to the network
-* send_data - send 3MB data file to endpoint
-* update_tests - update test results locally and in AWS
-* cleanup - removes all UE subscriptions from network database
+* "load_network" - subscribes thousands of UEs to the network
+* "send_data" - send 3MB data file to endpoint
+* "update_tests" - update test results locally and in AWS
+* "cleanup" - removes all UE subscriptions from network database
 
 
 ## Coralogix Dashboards
