@@ -11,8 +11,8 @@ Prerequisites:
 
 
 Steps:
-1. [Mirror](https://docs.gitlab.com/ee/user/project/repository/mirror/) this repository in Gitlab or connect this repository [externally](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/) to Gitlab 
-2. Set up a private Gitlab runner on the CNTF EKS cluster (***Note: You only need to do this process once, not every time you execute a new repository***):
+1. [Mirror](https://docs.gitlab.com/ee/user/project/repository/mirror/) this repository or connect it [externally](https://docs.gitlab.com/ee/ci/ci_cd_for_external_repos/) to Gitlab 
+2. Set up a private Gitlab runner on the CNTF EKS cluster (***Note: You only need to do this process once, not every time you execute code in a different CNTF repository***):
     * In Gitlab, on the left side of the screen, hover over "settings" and select "CI/CD"
     * Next to "Runners" select "expand"
     * Unselect "Enable shared runners for this project"
@@ -29,7 +29,7 @@ Steps:
         * Install your created runner via helm: 
         "helm upgrade --install <_RUNNER_NAME_> -n <_NAMESPACE_> --set runnerRegistrationToken=<_RUNNER_TOKEN_> --set gitlabUrl=http://www.gitlab.com gitlab/gitlab-runner"
         * Check to see if your runner is working: "kubectl get pods -n <_NAMESPACE_>" (you should see "1/1" under "READY" and "Running" under "STATUS")
-    * In Gitlab, Under "Assigned project runners" you should now see that your runner has a green circle to it, signaling that its properly configured
+    * In Gitlab, Under "Assigned project runners" you should now see that your runner has a green circle next to it, signaling a "ready" status
 
 3. Authenticate Gitlab with AWS: https://docs.gitlab.com/ee/ci/cloud_deployment/
 
