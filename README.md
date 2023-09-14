@@ -25,10 +25,10 @@ Steps:
     * On your local terminal:
         * Install the helm gitlab repository: "helm repo add gitlab https://charts.gitlab.io"
         * intialize helm (for helm version 2): "helm init" 
-        * create a namespace for your gitlab runner(s) in the cntf cluster: "kubectl create namespace <NAMESPACE (e.g. "gitlab-runners")>"
+        * create a namespace for your gitlab runner(s) in the cntf cluster: "kubectl create namespace <_NAMESPACE_ (e.g. "gitlab-runners")>"
         * Install your created runner via helm: 
-        "helm upgrade --install <RUNNER_NAME> -n gitlab-runner --set runnerRegistrationToken=<RUNNER_TOKEN> --set gitlabUrl=http://www.gitlab.com gitlab/gitlab-runner"
-        * Check to see if your runner is working: "kubectl get pods -n <NAMESPACE>" (you should see "1/1" under "READY" and "Running" under "STATUS")
+        "helm upgrade --install <_RUNNER_NAME_> -n <_NAMESPACE_> --set runnerRegistrationToken=<_RUNNER_TOKEN_> --set gitlabUrl=http://www.gitlab.com gitlab/gitlab-runner"
+        * Check to see if your runner is working: "kubectl get pods -n <_NAMESPACE_>" (you should see "1/1" under "READY" and "Running" under "STATUS")
     * In Gitlab, Under "Assigned project runners" you should now see that your runner has a green circle to it, signaling that its properly configured
 
 3. Authenticate Gitlab with AWS: https://docs.gitlab.com/ee/ci/cloud_deployment/
